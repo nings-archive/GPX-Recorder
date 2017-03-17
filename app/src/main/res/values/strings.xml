@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">GPS Logger</string>
+    <string name="lat_label">CURRENT LATITUDE</string>
+    <string name="lng_label">CURRENT LONGITUDE</string>
+</resources>
