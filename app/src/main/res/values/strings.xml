@@ -2,4 +2,7 @@
     <string name="app_name">GPS Logger</string>
     <string name="lat_label">CURRENT LATITUDE</string>
     <string name="lng_label">CURRENT LONGITUDE</string>
+    <string name="btn_record">RECORD</string>
+    <string name="btn_stop">STOP</string>
+    <string name="btn_pause">PAUSE</string>
 </resources>
