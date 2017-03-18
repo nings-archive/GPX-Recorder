@@ -5,4 +5,8 @@
     <string name="btn_record">RECORD</string>
     <string name="btn_stop">STOP</string>
     <string name="btn_pause">PAUSE</string>
+    <string name="dlg_no_permission_title">GPS permissions not granted!</string>
+    <string name="dlg_no_permission_message">GPX Recorder requires GPS permissions to run.</string>
+    <string name="dlg_no_permission_cancel">Cancel</string>
+    <string name="dlg_no_permission_ok">OK</string>
 </resources>

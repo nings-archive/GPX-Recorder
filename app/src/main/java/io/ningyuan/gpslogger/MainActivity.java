@@ -2,11 +2,13 @@ package io.ningyuan.gpslogger;
 
 import android.Manifest;
 import android.app.Service;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.TextView;
@@ -15,13 +17,13 @@ import org.w3c.dom.Text;
 
 public class MainActivity extends AppCompatActivity implements LocationListener {
 
+    private GpsPermissionHandler GpsPermissions = new GpsPermissionHandler();
+
     private TextView tv_latitude;
     private TextView tv_longitude;
     private LocationManager locationManager;
     private Location location;
-    private final int REQUEST_LOCATION = 200;
 
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -29,11 +31,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         tv_longitude = (TextView) findViewById(R.id.lng_content);
         locationManager = (LocationManager) getSystemService(Service.LOCATION_SERVICE);
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(MainActivity.this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    REQUEST_LOCATION);
+        if (!GpsPermissions.isPermitted(this)) {
+            GpsPermissions.ask(this);
         } else {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 2, this);
             if (locationManager != null) {
@@ -55,17 +54,16 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
     }
 
-
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        if (requestCode == REQUEST_LOCATION) {
+        if (requestCode == GpsPermissions.REQUEST_CODE) {
             if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 2, this);
                 if (locationManager != null) {
                     location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
                     initialiseLocation();
                 } else {
-                    // TODO(2): showAskForGps()
+                    // alertdialog
                 }
             }
         }
