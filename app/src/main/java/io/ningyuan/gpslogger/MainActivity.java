@@ -41,12 +41,32 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             }
         }
 
+        initialiseLocation();
+    }
+
+    private void initialiseLocation () {
         if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             if (location != null) {
                 tv_latitude.setText(String.valueOf(location.getLatitude()));
                 tv_longitude.setText(String.valueOf(location.getLongitude()));
             } else {
-                // TODO(1): showGPSDisabledAlertToUser();
+                // TODO(1): showGpsDisabledAlert()
+            }
+        }
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == REQUEST_LOCATION) {
+            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 2, this);
+                if (locationManager != null) {
+                    location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                    initialiseLocation();
+                } else {
+                    // TODO(2): showAskForGps()
+                }
             }
         }
     }
@@ -61,14 +81,4 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     @Override public void onProviderEnabled(String provider) {}
     @Override public void onProviderDisabled(String provider) {/*TODO(2): showGPSDisabled...();))*/}
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults){
-        if (requestCode == REQUEST_LOCATION) {
-            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // EMPTY???
-            }
-        }
-    }
-
-    //TODO(3) private void showGPSDisabledAlertToUser() {...}
 }
