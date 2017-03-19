@@ -34,22 +34,22 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         if (!GpsPermissions.isPermitted(this)) {
             GpsPermissions.ask(this);
         } else {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 2, this);
-            if (locationManager != null) {
-                location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            initialiseLocation();
             }
         }
 
-        initialiseLocation();
-    }
 
     private void initialiseLocation () {
-        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            if (location != null) {
-                tv_latitude.setText(String.valueOf(location.getLatitude()));
-                tv_longitude.setText(String.valueOf(location.getLongitude()));
-            } else {
-                // TODO(1): showGpsDisabledAlert()
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 2, this);
+        if (locationManager != null) {
+            location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                if (location != null) {
+                    tv_latitude.setText(String.valueOf(location.getLatitude()));
+                    tv_longitude.setText(String.valueOf(location.getLongitude()));
+                } else {
+                    // TODO(1): showGpsDisabledAlert()
+                }
             }
         }
     }
@@ -58,13 +58,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         if (requestCode == GpsPermissions.REQUEST_CODE) {
             if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 2, this);
-                if (locationManager != null) {
-                    location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
                     initialiseLocation();
-                } else {
+            } else {
                     // alertdialog
-                }
             }
         }
     }
