@@ -6,7 +6,7 @@ import android.location.Location;
  * Created by ning on 20/3/2017.
  */
 
-public class GpxUtils {
+class GpxUtils {
     final static int LATITUDE = 0;
     final static int LONGITUDE = 1;
 
