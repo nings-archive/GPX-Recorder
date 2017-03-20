@@ -23,23 +23,23 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/lat_label"
-            android:textSize="30dp"/>
+            android:textSize="30sp"/>
         <TextView
             android:id="@+id/lat_content"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="20dp"/>
+            android:textSize="20sp"/>
         <TextView
             android:id="@+id/lng_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/lng_label"
-            android:textSize="30dp"/>
+            android:textSize="30sp"/>
         <TextView
             android:id="@+id/lng_content"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="20dp"/>
+            android:textSize="20sp"/>
 
     </LinearLayout>
 

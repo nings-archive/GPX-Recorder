@@ -1,22 +1,16 @@
 package io.ningyuan.gpslogger;
 
-import android.Manifest;
 import android.app.Service;
-import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import org.w3c.dom.Text;
 
 public class MainActivity extends AppCompatActivity implements LocationListener {
 
@@ -29,6 +23,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private Button btn_pause;
     private LocationManager locationManager;
     private Location location;
+    private Boolean is_recording = false;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,8 +40,15 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         btn_record.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                startRecording();
                 Toast toast = Toast.makeText(MainActivity.this, "I'M WORKING ON IT", Toast.LENGTH_SHORT);
                 toast.show();
+            }
+        });
+        btn_stop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                stopRecording();
             }
         });
 
@@ -57,6 +59,19 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
     }
 
+    private void startRecording() {
+        is_recording = true;
+        btn_record.setEnabled(false);
+        btn_stop.setEnabled(true);
+        btn_pause.setEnabled(true);
+    }
+
+    private void stopRecording() {
+        is_recording = false;
+        btn_record.setEnabled(true);
+        btn_stop.setEnabled(false);
+        btn_pause.setEnabled(false);
+    }
 
     private void initialiseLocation () {
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 2, this);
@@ -64,19 +79,15 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
             if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                 if (location != null) {
-                    showLocation(location);
-                } else {
-                    // ?
+                    showLocationDMS(location);
                 }
             }
         }
     }
 
-    private void showLocation (Location location) {
+    private void showLocationDMS (Location location) {
         tv_latitude.setText(GpxUtils.getDMS(location.getLatitude(), GpxUtils.LATITUDE));
         tv_longitude.setText(GpxUtils.getDMS(location.getLongitude(), GpxUtils.LONGITUDE));
-//        tv_latitude.setText(Location.convert(location.getLatitude(), Location.FORMAT_SECONDS));
-//        tv_longitude.setText(Location.convert(location.getLongitude(), Location.FORMAT_SECONDS));
     }
 
     @Override
@@ -93,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     @Override
     public void onLocationChanged(Location location) {
-        showLocation(location);
+        showLocationDMS(location);
     }
 
     @Override public void onStatusChanged(String provider, int status, Bundle extras) {}
