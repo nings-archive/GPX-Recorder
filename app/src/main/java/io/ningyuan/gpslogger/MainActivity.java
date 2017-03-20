@@ -45,13 +45,19 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
             if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                 if (location != null) {
-                    tv_latitude.setText(String.valueOf(location.getLatitude()));
-                    tv_longitude.setText(String.valueOf(location.getLongitude()));
+                    showLocation(location);
                 } else {
                     // TODO(1): showGpsDisabledAlert()
                 }
             }
         }
+    }
+
+    private void showLocation (Location location) {
+        tv_latitude.setText(GpxUtils.getDMS(location.getLatitude(), GpxUtils.LATITUDE));
+        tv_longitude.setText(GpxUtils.getDMS(location.getLongitude(), GpxUtils.LONGITUDE));
+//        tv_latitude.setText(Location.convert(location.getLatitude(), Location.FORMAT_SECONDS));
+//        tv_longitude.setText(Location.convert(location.getLongitude(), Location.FORMAT_SECONDS));
     }
 
     @Override
@@ -67,8 +73,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     @Override
     public void onLocationChanged(Location location) {
-        tv_latitude.setText(String.valueOf(location.getLatitude()));
-        tv_longitude.setText(String.valueOf(location.getLongitude()));
+        showLocation(location);
     }
 
     @Override public void onStatusChanged(String provider, int status, Bundle extras) {}
