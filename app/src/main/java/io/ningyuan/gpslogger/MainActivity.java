@@ -16,11 +16,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     private GpsPermissionHandler GpsPermissions = new GpsPermissionHandler();
 
-    private TextView tv_latitude;
-    private TextView tv_longitude;
-    private Button btn_record;
-    private Button btn_stop;
-    private Button btn_pause;
+    private TextView tv_latitude, tv_longitude;
+    private Button btn_record, btn_stop, btn_pause;
     private LocationManager locationManager;
     private Location location;
     private Boolean is_recording = false;
