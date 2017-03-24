@@ -26,7 +26,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private Button btn_record, btn_stop, btn_pause;
     private LocationManager locationManager;
     private Location location;
+
     private Boolean is_recording = false;
+    private GpxFile gpxFile;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,14 +63,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     }
 
     private void startRecording() {
-        is_recording = true;
-        btn_record.setEnabled(false);
-        btn_stop.setEnabled(true);
-        btn_pause.setEnabled(true);
         if (!PermissionHandler.WriteisPermitted(this)) {
             PermissionHandler.askWrite(this);
         } else {
-            saveInternalFile();
+            is_recording = true;
+            btn_record.setEnabled(false);
+            btn_stop.setEnabled(true);
+            btn_pause.setEnabled(true);
+            gpxFile = new GpxFile();
         }
     }
 
@@ -77,33 +79,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         btn_record.setEnabled(true);
         btn_stop.setEnabled(false);
         btn_pause.setEnabled(false);
+        gpxFile.save();
+        Toast fileSavedToast = Toast.makeText(MainActivity.this, String.format("File saved as %s in Documents", gpxFile.timeStamp), Toast.LENGTH_LONG);
+        fileSavedToast.show();
     }
 
-    private void saveInternalFile() {
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
-        String coords;
-        File myFile;
-        FileOutputStream outputStream;
-
-        if (location != null) {
-            coords = GpxUtils.getDMS(location.getLatitude(), GpxUtils.LATITUDE) + GpxUtils.getDMS(location.getLongitude(), GpxUtils.LONGITUDE);
-            try {
-                myFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), timeStamp);
-                myFile.createNewFile();
-                outputStream = new FileOutputStream(myFile);
-                outputStream.write(coords.getBytes());
-                outputStream.close();
-                Toast toast = Toast.makeText(MainActivity.this, "Saved as " + timeStamp, Toast.LENGTH_SHORT);
-                toast.show();
-                Log.i("saveInternalFile", getFileStreamPath(timeStamp).getAbsolutePath());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else {
-            Toast toast = Toast.makeText(MainActivity.this, "Unable to save", Toast.LENGTH_SHORT);
-            toast.show();
-        }
-    }
 
     private void initialiseLocation () {
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 2, this);
@@ -146,6 +126,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     @Override
     public void onLocationChanged(Location location) {
         showLocationDMS(location);
+        if (is_recording) {
+            gpxFile.addGpsCoords(location);
+        }
     }
 
     @Override public void onStatusChanged(String provider, int status, Bundle extras) {}
