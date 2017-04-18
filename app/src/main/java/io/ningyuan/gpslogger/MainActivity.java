@@ -51,9 +51,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         btn_record = (Button) findViewById(R.id.btn_record);
         btn_stop = (Button) findViewById(R.id.btn_stop);
         btn_pause = (Button) findViewById(R.id.btn_pause);
+
         locationManager = (LocationManager) getSystemService(Service.LOCATION_SERVICE);
         gpxService = new Intent(getApplicationContext(), GpxService.class);
-        bindService();
 
         btn_record.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -68,11 +68,20 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             }
         });
 
-        if (!PermissionHandler.GPSisPermitted(this)) {
-            PermissionHandler.askGPS(this);
-        } else {
-            initialiseLocation();
-        }
+        bindService();
+        initialiseLocation();
+    }
+
+    protected void onPause() {
+        Log.d(LOG_TAG, "onPause");
+        super.onPause();
+        locationManager.removeUpdates(this);
+    }
+
+    protected void onResume() {
+        Log.d(LOG_TAG, "onResume");
+        super.onResume();
+        initialiseLocation();
     }
 
     private void bindService() {
@@ -84,16 +93,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                     Log.d(LOG_TAG, "bindService: onServiceConnected");
                     GpxService.GpxServiceBinder gpxServiceBinder = (GpxService.GpxServiceBinder) service;
                     myGpxService = gpxServiceBinder.getService();
-
-                    if (myGpxService.is_recording) {
-                        btn_record.setEnabled(false);
-                        btn_pause.setEnabled(false);
-                        btn_stop.setEnabled(true);
-                    } else {
-                        btn_record.setEnabled(true);
-                        btn_pause.setEnabled(false);
-                        btn_stop.setEnabled(false);
-                    }
+                    setButtonEnabled();
                 }
 
                 @Override
@@ -102,14 +102,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             };
             Log.d(LOG_TAG, "new ServiceConnection");
         }
-
         bindService(gpxService, serviceConnection, Context.BIND_AUTO_CREATE);
-
-        if (myGpxService == null) {
-            Log.e(LOG_TAG, "bindService: myGpxService == null");
-        } else {
-            Log.d(LOG_TAG, "bindService: myGpxService != null");
-        }
     }
 
     private void startRecording() {
@@ -118,35 +111,55 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             PermissionHandler.askWrite(this);
         } else {
             Log.d(LOG_TAG, "else{} in startRecording()");
-            btn_record.setEnabled(false);
-            btn_stop.setEnabled(true);
-            btn_pause.setEnabled(true);
-            // gpxFile = new GpxFile();
-
             gpxService.setAction(GpxService.START_SERVICE);
             startService(gpxService);
+            toggleButtonEnabled();
         }
     }
 
     private void stopRecording() {
         Log.d(LOG_TAG, "stopRecording()");
-        btn_record.setEnabled(true);
-        btn_stop.setEnabled(false);
-        btn_pause.setEnabled(false);
-
         gpxService.setAction(GpxService.STOP_SERVICE);
         startService(gpxService);
+        toggleButtonEnabled();
+    }
+
+    private void setButtonEnabled() {
+        if (myGpxService.is_recording) {
+            btn_record.setEnabled(false);
+            btn_pause.setEnabled(false);
+            btn_stop.setEnabled(true);
+        } else {
+            btn_record.setEnabled(true);
+            btn_pause.setEnabled(false);
+            btn_stop.setEnabled(false);
+        }
+    }
+
+    private void toggleButtonEnabled() {
+        if (btn_record.isEnabled()) {
+            btn_record.setEnabled(false);
+            btn_pause.setEnabled(true);
+            btn_stop.setEnabled(true);
+        } else {
+            btn_record.setEnabled(true);
+            btn_pause.setEnabled(false);
+            btn_stop.setEnabled(false);
+        }
     }
 
      void initialiseLocation () {
-         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 2, this);
-         Log.d(LOG_TAG, "initialiseLocation: requestLocationUpdates");
-         if (locationManager != null) {
-             location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-             if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                 if (location != null) {
-                    Log.d(LOG_TAG, "initialiseLocation: last if");
-                    showLocationDMS(location);
+         if (!PermissionHandler.GPSisPermitted(this)) {
+             PermissionHandler.askGPS(this);
+         } else {
+             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 2, this);
+             Log.d(LOG_TAG, "initialiseLocation: requestLocationUpdates");
+             if (locationManager != null) {
+                 location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                 if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                     if (location != null) {
+                         showLocationDMS(location);
+                     }
                  }
              }
          }
@@ -164,7 +177,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         if (requestCode == PermissionHandler.GPS_REQUEST_CODE) {
             if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    initialiseLocation();
+                initialiseLocation();
             } else {
                 Toast toast = Toast.makeText(MainActivity.this, "You must permit GPS permissions to use a GPS app!", Toast.LENGTH_LONG);
                 toast.show();

@@ -66,11 +66,11 @@ public class GpxService extends Service implements LocationListener{
             Intent notificationIntent = new Intent(this, MainActivity.class);
             PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
             Notification notification = new Notification.Builder(this)
-                    .setContentTitle("G")
-                    .setContentText("TEXT")
+                    .setContentTitle("Gpx Recorder is active")
+                    .setContentText("Currently recording your position.")
                     .setSmallIcon(R.drawable.small_icon)
                     .setContentIntent(pendingIntent)
-                    .setTicker("TICKER")
+                    .setTicker("Gpx Recorder is recording!")
                     .build();
             startForeground(ONGOING_NOTIFICATION_ID, notification);
 
@@ -79,6 +79,7 @@ public class GpxService extends Service implements LocationListener{
             Log.d(LOG_TAG, "Entered if equals STOP_SERVICE");
             gpxFile.save();
             locationManager.removeUpdates(this);
+            //TODO: Add location of saved file in this toast
             Toast toast = Toast.makeText(this, "Recording stopped", Toast.LENGTH_SHORT);
             toast.show();
             stopForeground(true);
