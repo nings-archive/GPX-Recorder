@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -36,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private LocationManager locationManager;
     private Location location;
     private Intent gpxService;
+    private final Criteria criteria = new Criteria();
 
     private ServiceConnection serviceConnection;
     private GpxService myGpxService;
@@ -69,7 +71,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         });
 
         bindService();
-        initialiseLocation();
     }
 
     protected void onPause() {
@@ -152,14 +153,13 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
          if (!PermissionHandler.GPSisPermitted(this)) {
              PermissionHandler.askGPS(this);
          } else {
-             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 2, this);
+             // locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 2, this);
+             locationManager.requestLocationUpdates(1000, 0, criteria, this, null);
              Log.d(LOG_TAG, "initialiseLocation: requestLocationUpdates");
              if (locationManager != null) {
                  location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                 if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                     if (location != null) {
-                         showLocationDMS(location);
-                     }
+                 if (location != null) {
+                     showLocationDMS(location);
                  }
              }
          }

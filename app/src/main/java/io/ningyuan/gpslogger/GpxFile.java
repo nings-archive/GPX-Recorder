@@ -40,7 +40,7 @@ class GpxFile {
         try {
             FileOutputStream outputStream = new FileOutputStream(ouputFile, true);
 
-            outputStream.write("<gpx><trk><trkseg>".getBytes());
+            outputStream.write("<gpx><trk><trkseg>\n".getBytes());
             for (trkpt pt : gpsCoords)
                 outputStream.write(pt.formatTag().getBytes());
             outputStream.write("</trkseg></trk></gpx>".getBytes());

@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -22,6 +23,7 @@ import android.widget.Toast;
 public class GpxService extends Service implements LocationListener{
     private GpxFile gpxFile;
     private LocationManager locationManager;
+    private Location location;
     public boolean is_recording = false;
     final static String START_SERVICE = "io.ningyuan.gpxservice.action.start";
     final static String STOP_SERVICE = "io.ningyuan.gpxservice.action.stop";
@@ -52,15 +54,16 @@ public class GpxService extends Service implements LocationListener{
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent.getAction().equals(START_SERVICE)) {
+            Log.d(LOG_TAG, "onStartCommand: START_SERVICE");
             Toast toast = Toast.makeText(this, "Recording started", Toast.LENGTH_SHORT);
             toast.show();
 
+            // locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 100, 2, this);
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 2, this);
+            location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
             gpxFile = new GpxFile();
-            if (locationManager == null) {
-                Log.e(LOG_TAG, "locationManager == null");
-            } else {
-                Log.d(LOG_TAG, "locationManager != null");
+            if (location != null) {
+                gpxFile.addGpsCoords(location);
             }
 
             Intent notificationIntent = new Intent(this, MainActivity.class);
@@ -76,7 +79,7 @@ public class GpxService extends Service implements LocationListener{
 
             is_recording = true;
         } else if (intent.getAction().equals(STOP_SERVICE)) {
-            Log.d(LOG_TAG, "Entered if equals STOP_SERVICE");
+            Log.d(LOG_TAG, "onStartCommand: STOP_SERVICE");
             gpxFile.save();
             locationManager.removeUpdates(this);
             //TODO: Add location of saved file in this toast
@@ -89,7 +92,7 @@ public class GpxService extends Service implements LocationListener{
     }
 
     @Override public void onLocationChanged (Location location) {
-        Log.d("GpxRecorder", "onLocationChanged called");
+        Log.d(LOG_TAG, "onLocationChanged called");
         gpxFile.addGpsCoords(location);
     }
 
