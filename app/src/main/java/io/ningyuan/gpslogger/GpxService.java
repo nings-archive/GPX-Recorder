@@ -5,7 +5,6 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -21,7 +20,7 @@ import android.widget.Toast;
  */
 
 public class GpxService extends Service implements LocationListener{
-    private GpxFile gpxFile;
+    private GpxParser gpxFile;
     private LocationManager locationManager;
     private Location location;
     public boolean is_recording = false;
@@ -61,9 +60,9 @@ public class GpxService extends Service implements LocationListener{
             // locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 100, 2, this);
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 2, this);
             location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-            gpxFile = new GpxFile();
+            gpxFile = new GpxParser();
             if (location != null) {
-                gpxFile.addGpsCoords(location);
+                gpxFile.addTrkpt(location);
             }
 
             Intent notificationIntent = new Intent(this, MainActivity.class);
@@ -93,7 +92,7 @@ public class GpxService extends Service implements LocationListener{
 
     @Override public void onLocationChanged (Location location) {
         Log.d(LOG_TAG, "onLocationChanged called");
-        gpxFile.addGpsCoords(location);
+        gpxFile.addTrkpt(location);
     }
 
     @Override public void onStatusChanged(String provider, int status, Bundle extras) {}

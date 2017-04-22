@@ -6,10 +6,6 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
 
-/**
- * Created by ningy on 19/3/2017.
- */
-
 class PermissionHandler {
     static final int WRITE_REQUEST_CODE = 68;
     static final int GPS_REQUEST_CODE = 69;
