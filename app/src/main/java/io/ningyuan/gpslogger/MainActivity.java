@@ -22,7 +22,7 @@ import android.widget.Toast;
 public class MainActivity extends AppCompatActivity implements LocationListener {
 
     private TextView tv_latitude, tv_longitude;
-    private Button btn_record, btn_stop, btn_pause;
+    private Button btn_record, btn_stop;
     private LocationManager locationManager;
     private Location location;
     private Intent gpxService;
@@ -41,7 +41,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         tv_longitude = (TextView) findViewById(R.id.lng_content);
         btn_record = (Button) findViewById(R.id.btn_record);
         btn_stop = (Button) findViewById(R.id.btn_stop);
-        btn_pause = (Button) findViewById(R.id.btn_pause);
 
         locationManager = (LocationManager) getSystemService(Service.LOCATION_SERVICE);
         gpxService = new Intent(getApplicationContext(), GpxService.class);
@@ -99,12 +98,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         Log.v(LOG_TAG, "startRecording()");
         if (!PermissionHandler.WriteisPermitted(this)) {
             PermissionHandler.askWrite(this);
-        } else {
-            Log.d(LOG_TAG, "else{} in startRecording()");
-            gpxService.setAction(GpxService.START_SERVICE);
-            startService(gpxService);
-            toggleButtonEnabled();
         }
+        Log.d(LOG_TAG, "else{} in startRecording()");
+        gpxService.setAction(GpxService.START_SERVICE);
+        startService(gpxService);
+        toggleButtonEnabled();
     }
 
     private void stopRecording() {
@@ -117,11 +115,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private void setButtonEnabled() {
         if (myGpxService.is_recording) {
             btn_record.setEnabled(false);
-            btn_pause.setEnabled(false);
             btn_stop.setEnabled(true);
         } else {
             btn_record.setEnabled(true);
-            btn_pause.setEnabled(false);
             btn_stop.setEnabled(false);
         }
     }
@@ -129,11 +125,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private void toggleButtonEnabled() {
         if (btn_record.isEnabled()) {
             btn_record.setEnabled(false);
-            btn_pause.setEnabled(true);
             btn_stop.setEnabled(true);
         } else {
             btn_record.setEnabled(true);
-            btn_pause.setEnabled(false);
             btn_stop.setEnabled(false);
         }
     }

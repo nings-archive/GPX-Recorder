@@ -15,10 +15,6 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
 
-/**
- * Created by ning on 2/4/2017.
- */
-
 public class GpxService extends Service implements LocationListener{
     private GpxParser gpxFile;
     private LocationManager locationManager;
