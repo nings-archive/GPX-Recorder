@@ -2,6 +2,7 @@ package io.ningyuan.gpslogger;
 
 import android.location.Location;
 import android.os.Environment;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -14,12 +15,28 @@ import java.util.LinkedList;
 class GpxParser {
     public String timeStamp;
     private LinkedList<trkpt> gpsCoords;
-    private File ouputFile;
+    private File outputDirectory;
+    private File outputFile;
     private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
     GpxParser () {
         timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime()) + ".gpx";
-        ouputFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), timeStamp);
+        outputDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
+        if(!outputDirectory.isDirectory()) {
+            boolean success = outputDirectory.mkdirs();
+            if (!success) {
+                throw new IllegalStateException("Couldn't create output directory: " + outputDirectory);
+            }
+        }
+        outputFile = new File(outputDirectory, timeStamp);
+        try {
+            FileOutputStream outputStream = new FileOutputStream(outputFile, true);
+            outputStream.write("Placeholder file, contents will be written when GPS Logger is stopped.".getBytes());
+            outputStream.flush();
+            outputStream.close();
+        } catch (IOException e) {
+            throw new IllegalStateException("Couldn't write to output file: " + outputFile);
+        }
         gpsCoords = new LinkedList();
     }
 
@@ -27,9 +44,9 @@ class GpxParser {
         gpsCoords.add(new trkpt(location));
     }
 
-    void save () {
+    void save () throws IllegalStateException {
         try {
-            FileOutputStream outputStream = new FileOutputStream(ouputFile, true);
+            FileOutputStream outputStream = new FileOutputStream(outputFile, true);
 
             outputStream.write("<gpx><trk><trkseg>\n".getBytes());
             for (trkpt pt : gpsCoords)
@@ -39,7 +56,7 @@ class GpxParser {
             outputStream.flush();
             outputStream.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new IllegalStateException("Couldn't write to output file: " + outputFile);
         }
     }
 
@@ -58,5 +75,9 @@ class GpxParser {
                     + String.format("<time>%s</time>", time)
                     + "</trkpt>\n";
         }
+    }
+
+    public String getOutputPath() {
+        return outputFile.getAbsolutePath();
     }
 }

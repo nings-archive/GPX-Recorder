@@ -21,7 +21,7 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity implements LocationListener {
 
-    private TextView tv_latitude, tv_longitude;
+    private TextView tv_latitude, tv_longitude, output_file;
     private Button btn_record, btn_stop;
     private LocationManager locationManager;
     private Location location;
@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         tv_longitude = (TextView) findViewById(R.id.lng_content);
         btn_record = (Button) findViewById(R.id.btn_record);
         btn_stop = (Button) findViewById(R.id.btn_stop);
+        output_file = (TextView) findViewById(R.id.outfile);
 
         locationManager = (LocationManager) getSystemService(Service.LOCATION_SERVICE);
         gpxService = new Intent(getApplicationContext(), GpxService.class);
@@ -110,6 +111,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         gpxService.setAction(GpxService.STOP_SERVICE);
         startService(gpxService);
         toggleButtonEnabled();
+        output_file.setText(myGpxService.getOutputPath());
     }
 
     private void setButtonEnabled() {

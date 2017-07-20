@@ -9,4 +9,6 @@
     <string name="dlg_no_permission_message">GPX Recorder requires GPS permissions to run.</string>
     <string name="dlg_no_permission_cancel">Cancel</string>
     <string name="dlg_no_permission_ok">OK</string>
+    <string name="outfile_label">Path to gpx file: </string>
+    <string name="not_recorded">[Not recorded]</string>
 </resources>

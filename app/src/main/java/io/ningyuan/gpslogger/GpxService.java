@@ -24,6 +24,7 @@ public class GpxService extends Service implements LocationListener{
     final static String STOP_SERVICE = "io.ningyuan.gpxservice.action.stop";
     final int ONGOING_NOTIFICATION_ID = 2;
     final String LOG_TAG = "GpxService";
+    private String outputPath;
 
     class GpxServiceBinder extends Binder {
         public GpxService getService() {
@@ -56,7 +57,13 @@ public class GpxService extends Service implements LocationListener{
             // locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 100, 2, this);
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 2, this);
             location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-            gpxFile = new GpxParser();
+            try {
+                gpxFile = new GpxParser();
+            } catch (IllegalStateException e) {
+                Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG);
+            }
+
+            outputPath = gpxFile.getOutputPath();
             if (location != null) {
                 gpxFile.addTrkpt(location);
             }
@@ -75,7 +82,11 @@ public class GpxService extends Service implements LocationListener{
             is_recording = true;
         } else if (intent.getAction().equals(STOP_SERVICE)) {
             Log.d(LOG_TAG, "onStartCommand: STOP_SERVICE");
-            gpxFile.save();
+            try {
+                gpxFile.save();
+            } catch (IllegalStateException e) {
+                Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG);
+            }
             locationManager.removeUpdates(this);
             //TODO: Add location of saved file in this toast
             Toast toast = Toast.makeText(this, "Recording stopped", Toast.LENGTH_SHORT);
@@ -94,4 +105,8 @@ public class GpxService extends Service implements LocationListener{
     @Override public void onStatusChanged(String provider, int status, Bundle extras) {}
     @Override public void onProviderEnabled(String provider) {}
     @Override public void onProviderDisabled(String provider) {}
+
+    public String getOutputPath() {
+        return outputPath;
+    }
 }
