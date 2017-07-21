@@ -99,11 +99,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         Log.v(LOG_TAG, "startRecording()");
         if (!PermissionHandler.WriteisPermitted(this)) {
             PermissionHandler.askWrite(this);
+        } else {
+            Log.d(LOG_TAG, "else{} in startRecording()");
+            gpxService.setAction(GpxService.START_SERVICE);
+            startService(gpxService);
+            toggleButtonEnabled();
         }
-        Log.d(LOG_TAG, "else{} in startRecording()");
-        gpxService.setAction(GpxService.START_SERVICE);
-        startService(gpxService);
-        toggleButtonEnabled();
     }
 
     private void stopRecording() {

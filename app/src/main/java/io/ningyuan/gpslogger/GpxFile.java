@@ -19,7 +19,7 @@ class GpxParser {
     private File outputFile;
     private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-    GpxParser () {
+    GpxParser() {
         timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime()) + ".gpx";
         outputDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
         if(!outputDirectory.isDirectory()) {
@@ -40,11 +40,11 @@ class GpxParser {
         gpsCoords = new LinkedList();
     }
 
-    void addTrkpt (Location location){
+    void addTrkpt(Location location){
         gpsCoords.add(new trkpt(location));
     }
 
-    void save () throws IllegalStateException {
+    void save() throws IllegalStateException {
         try {
             FileOutputStream outputStream = new FileOutputStream(outputFile, true);
 
@@ -70,7 +70,7 @@ class GpxParser {
             time = dateFormat.format(new Date());
         }
 
-        String formatTag () {
+        String formatTag() {
             return String.format("<trkpt lat=\"%f\" lon=\"%f\">", lat, lon)
                     + String.format("<time>%s</time>", time)
                     + "</trkpt>\n";

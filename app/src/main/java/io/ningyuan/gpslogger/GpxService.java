@@ -60,6 +60,7 @@ public class GpxService extends Service implements LocationListener{
             try {
                 gpxFile = new GpxParser();
             } catch (IllegalStateException e) {
+                e.printStackTrace();
                 Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG);
             }
 
